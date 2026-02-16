@@ -8,25 +8,19 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS FIRST
-app.use(
-    cors({
-        origin: "http://localhost:5173",
-        credentials: true,
-    })
-);
+// ✅ allow all origins
+app.use(cors());
 
-// ✅ Body parser second
+// ✅ body parser
 app.use(express.json());
 
-// ✅ Routes after middleware
+// routes
 const projectRoutes = require("./routes/projectRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 app.use("/api/projects", projectRoutes);
 app.use("/api/contact", contactRoutes);
-
-const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
