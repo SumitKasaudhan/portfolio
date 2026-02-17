@@ -9,7 +9,13 @@ const HeroV2 = () => {
     return (
         <section
             id="home"
-            className="relative isolate min-h-screen flex items-center justify-center text-center overflow-hidden bg-black text-white pt-24"
+            className="
+                relative isolate 
+                min-h-[calc(100vh-96px)] md:min-h-[85vh] sm:min-h-[75vh]
+                flex items-center justify-center 
+                text-center overflow-hidden 
+                bg-black text-white pt-24
+            "
         >
             {/* particles */}
             <HeroParticles />
@@ -20,11 +26,11 @@ const HeroV2 = () => {
             {/* content */}
             <div className="relative z-20 px-6">
 
-                <h1 className="text-6xl md:text-7xl font-bold tracking-widest text-cyan-300 drop-shadow-[0_0_18px_#00f0ff]">
+                <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-widest text-cyan-300 drop-shadow-[0_0_18px_#00f0ff]">
                     SUMIT KASAUDHAN
                 </h1>
 
-                <p className="mt-4 text-xl text-cyan-200">
+                <p className="mt-4 text-lg sm:text-xl text-cyan-200">
                     Front-End Developer | React Enthusiast | UI/UX Aficionado
                 </p>
 
