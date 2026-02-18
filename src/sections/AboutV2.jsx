@@ -84,32 +84,35 @@ const AboutV2 = () => {
                             </h2>
 
                             <a
-                                href="/public/Resume.pdf"
-                                download
+                                href="/resume.pdf"
+                                download="Sumit_Kasaudhan_Resume.pdf"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="
-            inline-flex items-center justify-center
-            px-6 py-2.5
-            rounded-lg
-            text-sm font-medium
-            text-cyan-200
+    inline-flex items-center justify-center
+    px-6 py-2.5
+    rounded-lg
+    text-sm font-medium
+    text-cyan-200
 
-            bg-gradient-to-r
-            from-purple-500/20
-            to-cyan-400/20
+    bg-gradient-to-r
+    from-purple-500/20
+    to-cyan-400/20
 
-            border border-cyan-300/25
-            backdrop-blur-md
+    border border-cyan-300/25
+    backdrop-blur-md
 
-            hover:scale-105
-            hover:text-white
-            hover:border-cyan-200
-            hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+    hover:scale-105
+    hover:text-white
+    hover:border-cyan-200
+    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
 
-            transition-all duration-300
-        "
+    transition-all duration-300
+  "
                             >
                                 Download Resume
                             </a>
+
 
                         </div>
 
