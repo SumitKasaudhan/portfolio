@@ -53,10 +53,23 @@ const Contact = () => {
                 <motion.h2
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    className="text-4xl font-bold text-center mb-16 text-cyan-300 drop-shadow-[0_0_10px_#00f0ff]"
+                    className="
+        text-4xl md:text-5xl
+        font-bold
+        text-center
+        mb-16
+        text-transparent
+        bg-clip-text
+        bg-gradient-to-r
+        from-cyan-300
+        via-cyan-400
+        to-teal-300
+        drop-shadow-[0_0_12px_rgba(34,211,238,0.25)]
+    "
                 >
                     Get In Touch
                 </motion.h2>
+
 
                 <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
 

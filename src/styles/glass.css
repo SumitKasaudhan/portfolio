@@ -1,0 +1,28 @@
+/* ===== Glass UI System ===== */
+
+.glass {
+    background: rgba(15, 15, 30, 0.6);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 24px;
+    box-shadow:
+        0 0 40px rgba(139, 92, 246, 0.15),
+        inset 0 0 20px rgba(255, 255, 255, 0.04);
+}
+
+.glass-hover {
+    transition: all 0.35s ease;
+}
+
+.glass-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 50px rgba(139, 92, 246, 0.35);
+}
+
+/* ===== Section Background Glow ===== */
+
+.section-bg {
+    background:
+        radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.15), transparent 40%),
+        radial-gradient(circle at 70% 80%, rgba(34, 211, 238, 0.12), transparent 50%);
+}

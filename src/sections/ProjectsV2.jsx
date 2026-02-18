@@ -36,12 +36,18 @@ const ProjectsV2 = () => {
         <section id="projects" className="py-28 px-6">
 
             <h2 className="
-                text-5xl font-bold text-center mb-16
-                text-cyan-300
-                drop-shadow-[0_0_18px_#00f0ff]
-            ">
+    text-5xl font-bold text-center mb-16
+    text-transparent
+    bg-clip-text
+    bg-gradient-to-r
+    from-cyan-300
+    via-cyan-400
+    to-teal-300
+    drop-shadow-[0_0_12px_rgba(34,211,238,0.25)]
+">
                 Featured Projects
             </h2>
+
 
             <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
 

@@ -28,8 +28,10 @@ const StatsSection = () => {
                     <div key={i} className="group">
 
                         <h3 className="
-                            text-4xl md:text-5xl font-bold text-cyan-300
-                            drop-shadow-[0_0_18px_#00f0ff]
+                            text-4xl md:text-5xl font-bold
+                            text-transparent bg-clip-text
+                            bg-gradient-to-r from-cyan-300 via-cyan-400 to-teal-300
+                            drop-shadow-[0_0_12px_rgba(34,211,238,0.25)]
                             group-hover:scale-110 transition
                         ">
                             {s.value}

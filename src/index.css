@@ -23,3 +23,15 @@ html {
   text-shadow: 0 0 14px rgba(0, 255, 255, 0.5);
 }
 
+/* ===== Global Premium Heading ===== */
+
+.heading-glow {
+  @apply text-transparent bg-clip-text font-bold tracking-wide;
+  background-image: linear-gradient(90deg,
+      #67e8f9,
+      #22d3ee,
+      #06b6d4);
+  text-shadow:
+    0 0 10px rgba(34, 211, 238, 0.25),
+    0 0 30px rgba(34, 211, 238, 0.08);
+}

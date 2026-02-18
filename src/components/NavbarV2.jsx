@@ -16,9 +16,15 @@ const NavbarV2 = () => {
 
     const scrollTo = (id) => {
         const el = document.getElementById(id);
-        if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
+
+        // reload if already at home
+        if (id === "home" && window.scrollY < 50) {
+            window.location.reload();
+            return;
         }
+
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+
         setOpen(false);
     };
 
@@ -26,16 +32,31 @@ const NavbarV2 = () => {
         <motion.nav
             initial={{ y: -80 }}
             animate={{ y: 0 }}
-            className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur border-b border-white/10"
+            className="fixed top-0 left-0 w-full z-50
+                       bg-black/70 backdrop-blur border-b border-white/10"
         >
             <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
 
                 {/* Logo */}
                 <button
                     onClick={() => scrollTo("home")}
-                    className="font-bold text-2xl tracking-wide text-cyan-400"
+                    className="flex items-center gap-3 group"
                 >
-                    SUMIT KASAUDHAN
+                    <img
+                        src="/favicon.png"
+                        alt="logo"
+                        className="w-8 h-8 transition-transform duration-300 group-hover:scale-105"
+                    />
+
+                    <span className="
+                        font-bold text-2xl tracking-wide
+                        text-cyan-300
+                        transition-all duration-300
+                        group-hover:text-cyan-200
+                        group-hover:tracking-wider
+                    ">
+                        SUMIT KASAUDHAN
+                    </span>
                 </button>
 
                 {/* Desktop menu */}
@@ -44,7 +65,16 @@ const NavbarV2 = () => {
                         <button
                             key={l.id}
                             onClick={() => scrollTo(l.id)}
-                            className="hover:text-cyan-400 transition"
+                            className="
+                                relative text-white/80
+                                hover:text-cyan-300
+                                transition
+                                after:absolute after:left-0 after:-bottom-1
+                                after:w-0 after:h-[2px]
+                                after:bg-cyan-300
+                                after:transition-all
+                                hover:after:w-full
+                            "
                         >
                             {l.name}
                         </button>
@@ -62,12 +92,15 @@ const NavbarV2 = () => {
 
             {/* Mobile menu */}
             {open && (
-                <div className="md:hidden bg-black/95 text-center py-8 space-y-6 border-t border-white/10 text-lg">
+                <div className="
+                    md:hidden bg-black/95 text-center py-8
+                    space-y-6 border-t border-white/10 text-lg
+                ">
                     {links.map((l) => (
                         <button
                             key={l.id}
                             onClick={() => scrollTo(l.id)}
-                            className="block w-full hover:text-cyan-400 transition"
+                            className="block w-full hover:text-cyan-300 transition"
                         >
                             {l.name}
                         </button>

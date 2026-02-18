@@ -1,23 +1,26 @@
 import { motion } from "framer-motion";
+import Tilt from "react-parallax-tilt";
+
+/* ================= DATA ================= */
 
 const education = [
     {
-        title: "Master of Computer Applications (MCA)(Pursuing)",
+        title: "Master of Computer Applications (MCA)",
         org: "Lovely Professional University",
-        year: "2024 – 2026",
-        desc: "Advanced computer science & specialization.",
+        year: "2024 – 2026 (Pursuing)",
+        desc: "Currently pursuing MCA with focus on advanced software development, scalable systems, and modern web technologies.",
     },
-
     {
-    
         title: "Bachelor of Computer Applications (BCA)",
         org: "Chhatrapati Shahu Ji Maharaj University",
         year: "2021 – 2024",
+        desc: "Built strong foundation in computer science, programming, and full-stack development.",
     },
     {
         title: "Higher Secondary (12th)",
-        org: "Delhi Public School, Azaad Nagar, Kanpur",
+        org: "Delhi Public School, Kanpur",
         year: "2020 – 2021",
+        desc: "Focused on mathematics and computing fundamentals.",
     },
 ];
 
@@ -26,88 +29,169 @@ const experience = [
         title: "Front-End Developer Intern",
         org: "Graphura India Pvt Ltd",
         year: "Oct 2025 – Jan 2026",
-        desc: "Built responsive React apps and reusable UI components.",
+        desc: "Developed responsive React interfaces, reusable components, and improved UI consistency across dashboards.",
+        skills: [
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "React",
+            "Tailwind",
+            "Framer Motion",
+            "UI Design",
+        ],
     },
     {
         title: "Web Development Intern",
         org: "ApexPlanet Software",
         year: "2025",
-        desc: "Optimized frontend performance and responsive UI delivery.",
+        desc: "Optimized frontend performance and delivered production-ready UI systems.",
+        skills: [
+            "Responsive UI",
+            "Optimization",
+            "React",
+            "API Integration",
+            "Debugging",
+        ],
     },
- 
 ];
 
-const EducationExperience = () => {
+/* ================= TIMELINE ITEM ================= */
+
+const TimelineItem = ({ item, index }) => {
+    const isLeft = index % 2 === 0;
+
+    const card = (
+        <Tilt scale={1.02} tiltMaxAngleX={5} tiltMaxAngleY={5}>
+            <div className="
+                relative p-7 md:p-8 rounded-2xl
+                bg-[rgba(10,10,25,0.72)]
+                border border-purple-500/20
+                backdrop-blur-xl
+                shadow-[0_0_60px_rgba(139,92,246,0.18)]
+            ">
+
+                <div className="absolute inset-0 rounded-2xl
+                    bg-gradient-to-r
+                    from-purple-500/5 via-transparent to-cyan-400/5
+                    blur-[70px] pointer-events-none" />
+
+                <h3 className="text-lg md:text-xl font-semibold text-white">
+                    {item.title}
+                </h3>
+                <p className="text-purple-300 mt-1">{item.org}</p>
+                <p className="text-gray-500 text-sm mt-1">{item.year}</p>
+                <p className="text-gray-300 mt-3 leading-relaxed">
+                    {item.desc}
+                </p>
+
+                {/* KEY SKILLS */}
+                {item.skills && (
+                    <div className="mt-6">
+                        <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">
+                            Key Skills
+                        </p>
+
+                        <div className="flex flex-wrap gap-2">
+                            {item.skills.map((skill, i) => (
+                                <span
+                                    key={i}
+                                    className="
+                                        px-3 py-1 text-xs rounded-md
+                                        bg-purple-500/10
+                                        border border-purple-400/20
+                                        text-purple-200
+                                        hover:bg-purple-500/20
+                                        transition
+                                        shadow-[0_0_10px_rgba(139,92,246,0.25)]
+                                    "
+                                >
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </Tilt>
+    );
+
     return (
-        <section id="academics" className="bg-black text-white py-28 px-6">
+        <motion.div
+            initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.12 }}
+            viewport={{ once: true }}
+            className="relative flex mb-14 md:mb-16 w-full"
+        >
+            <div className={`w-1/2 pr-8 ${isLeft ? "block" : "invisible"}`}>
+                {isLeft && card}
+            </div>
+
+            <div className="relative w-0">
+                <div className="absolute left-1/2 -translate-x-1/2 top-4
+                    w-7 h-7 rounded-full
+                    bg-gradient-to-r from-purple-500 to-cyan-400
+                    shadow-[0_0_28px_rgba(168,85,247,0.9)]" />
+            </div>
+
+            <div className={`w-1/2 pl-8 ${!isLeft ? "block" : "invisible"}`}>
+                {!isLeft && card}
+            </div>
+        </motion.div>
+    );
+};
+
+/* ================= TIMELINE SECTION ================= */
+const TimelineSection = ({ title, data }) => {
+    return (
+        <section className="relative py-20 md:py-24">
 
             <motion.h2
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold text-center mb-16 text-cyan-300 drop-shadow-[0_0_10px_#00f0ff]"
+                viewport={{ once: true }}
+                className="
+                    text-4xl md:text-5xl
+                    font-bold
+                    text-center
+                    mb-14 md:mb-20
+                    text-transparent
+                    bg-clip-text
+                    bg-gradient-to-r
+                    from-cyan-300
+                    via-cyan-400
+                    to-teal-300
+                    drop-shadow-[0_0_12px_rgba(34,211,238,0.25)]
+                "
             >
-                Education & Experience
+                {title}
             </motion.h2>
 
-            <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-14">
+            <div className="relative max-w-5xl mx-auto px-6">
 
-                {/* LEFT — EDUCATION CARDS */}
-                <div>
+                <div className="absolute left-1/2 top-0 bottom-0 w-[2px]
+                    bg-gradient-to-b
+                    from-purple-500 via-cyan-400 to-purple-500
+                    opacity-70" />
 
-                    <h3 className="text-2xl font-semibold mb-8 text-cyan-200">
-                        Education
-                    </h3>
-
-                    <div className="space-y-6">
-
-                        {education.map((item, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, x: -30 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.15 }}
-                                className="bg-white/5 border border-white/10 backdrop-blur rounded-xl p-6 hover:bg-white/10 transition"
-                            >
-                                <h4 className="font-semibold text-lg">{item.title}</h4>
-                                <p className="text-gray-400">{item.org}</p>
-                                <span className="text-gray-500 text-sm">{item.year}</span>
-                            </motion.div>
-                        ))}
-
-                    </div>
-                </div>
-
-                {/* RIGHT — EXPERIENCE TIMELINE */}
-                <div>
-
-                    <h3 className="text-2xl font-semibold mb-8 text-purple-300">
-                        Experience
-                    </h3>
-
-                    <div className="relative border-l border-white/20 ml-4">
-
-                        {experience.map((item, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, x: 40 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.2 }}
-                                className="ml-8 mb-10 relative"
-                            >
-                                {/* dot */}
-                                <div className="absolute -left-[38px] w-5 h-5 bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.8)]"></div>
-
-                                <h4 className="font-semibold text-lg">{item.title}</h4>
-                                <p className="text-purple-300">{item.org}</p>
-                                <span className="text-gray-500 text-sm">{item.year}</span>
-                                <p className="text-gray-400 mt-2">{item.desc}</p>
-                            </motion.div>
-                        ))}
-
-                    </div>
-                </div>
-
+                {data.map((item, i) => (
+                    <TimelineItem key={i} item={item} index={i} />
+                ))}
             </div>
+        </section>
+    );
+};
+
+
+/* ================= MAIN EXPORT ================= */
+
+const EducationExperience = () => {
+    return (
+        <section id="academics" className="bg-black text-white">
+
+            <TimelineSection title="Education" data={education} />
+            <TimelineSection title="Experience" data={experience} />
+
         </section>
     );
 };

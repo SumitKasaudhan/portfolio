@@ -26,13 +26,30 @@ const HeroV2 = () => {
             {/* content */}
             <div className="relative z-20 px-6">
 
-                <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-widest text-cyan-300 drop-shadow-[0_0_18px_#00f0ff]">
+                <h1 className="
+  text-4xl sm:text-5xl md:text-6xl lg:text-7xl
+  font-extrabold
+  tracking-[0.08em]
+  bg-gradient-to-r from-cyan-300 via-cyan-200 to-cyan-400
+  text-transparent bg-clip-text
+  drop-shadow-[0_0_12px_rgba(34,211,238,0.25)]
+  leading-tight
+">
                     SUMIT KASAUDHAN
                 </h1>
 
-                <p className="mt-4 text-lg sm:text-xl text-cyan-200">
+
+                <p className="
+  mt-6
+  text-sm sm:text-base md:text-lg
+  text-gray-300
+  tracking-wide
+  opacity-90
+">
                     Front-End Developer | React Enthusiast | UI/UX Aficionado
                 </p>
+
+
 
                 <div className="flex gap-6 justify-center mt-10 flex-wrap">
 
