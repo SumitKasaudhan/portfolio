@@ -1,94 +1,401 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 
 const ProjectModal = ({ project, close }) => {
+
+    /* ===== ESC + BODY LOCK ===== */
+
+    useEffect(() => {
+
+        const esc = (e) => {
+            if (e.key === "Escape") close();
+        };
+
+        document.body.style.overflow = "hidden";
+
+        window.addEventListener("keydown", esc);
+
+        return () => {
+
+            document.body.style.overflow = "auto";
+            window.removeEventListener("keydown", esc);
+
+        };
+
+    }, [close]);
+
+
     if (!project) return null;
 
+
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur z-50 flex items-center justify-center px-6"
-            onClick={close}
-        >
+
+        <AnimatePresence>
+
             <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                className="bg-[#0f0f16] rounded-xl max-w-5xl w-full border border-white/10 overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
+
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+
+                onClick={close}
+
+                className="
+
+fixed inset-0 z-50
+
+flex items-center justify-center
+
+bg-black/70 backdrop-blur-sm
+
+p-3 sm:p-6
+
+"
+
             >
 
-                {/* Scrollable image viewer */}
-                <div className="h-[60vh] overflow-y-auto bg-black">
-                    <img
-                        src={project.image}
-                        className="w-full"
-                        alt={project.title}
-                    />
-                </div>
+                {/* ===== MODAL ===== */}
 
-                <div className="p-8 space-y-4">
+                <motion.div
 
-                    <h2 className="text-2xl font-bold">
-                        {project.title}
-                    </h2>
+                    initial={{ y: 40, opacity: 0, scale: .96 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
 
-                    <p className="text-gray-400">
-                        {project.desc}
-                    </p>
+                    transition={{ duration: .3 }}
 
-                    <div className="flex flex-wrap gap-2">
-                        {project.tech.map((t, i) => (
-                            <span
-                                key={i}
-                                className="px-3 py-1 bg-white/10 rounded-full text-sm"
-                            >
-                                {t}
-                            </span>
-                        ))}
+                    onClick={(e) => e.stopPropagation()}
+
+                    className="
+
+relative
+
+w-full
+
+max-w-6xl
+
+max-h-[92vh]
+
+rounded-3xl
+
+bg-[#0f1120f2]
+
+border border-white/10
+
+shadow-[0_30px_80px_rgba(0,0,0,0.85)]
+
+flex flex-col
+
+overflow-hidden
+
+"
+
+                >
+
+                    {/* CLOSE */}
+
+                    <button
+
+                        onClick={close}
+
+                        className="
+
+absolute top-4 right-4
+
+z-30
+
+w-10 h-10
+
+rounded-full
+
+bg-black/60
+
+hover:bg-black
+
+text-white
+
+transition
+
+"
+
+                    >
+
+                        ✕
+
+                    </button>
+
+
+
+                    {/* ================= IMAGE SCROLL ONLY ================= */}
+
+                    <div
+
+                        className="
+
+relative
+
+h-[240px]
+
+sm:h-[300px]
+
+md:h-[360px]
+
+lg:h-[420px]
+
+overflow-y-auto
+
+bg-black
+
+"
+
+                    >
+
+                        <img
+
+                            src={project.image}
+
+                            alt={project.title}
+
+                            className="
+
+w-full
+
+min-h-full
+
+object-cover
+
+object-center
+
+"
+
+                        />
+
+                        {/* fade */}
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
+
                     </div>
 
-                    <div className="flex gap-4 pt-4 flex-wrap">
 
-                        {project.github && (
-                            <a
-                                href={project.github}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="px-4 py-2 bg-purple-600 rounded hover:opacity-80"
+
+                    {/* ================= CONTENT FIXED ================= */}
+
+                    <div
+
+                        className="
+
+px-5 sm:px-8 lg:px-12
+
+py-6 sm:py-8
+
+space-y-6
+
+"
+
+                    >
+
+                        {/* TITLE */}
+
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+
+                            {project.title}
+
+                        </h2>
+
+
+                        {/* DESC */}
+
+                        <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-3xl">
+
+                            {project.desc}
+
+                        </p>
+
+
+
+                        {/* TECH */}
+
+                        <div className="flex flex-wrap gap-2">
+
+                            {project.tech.map((tech, i) => (
+
+                                <span
+
+                                    key={i}
+
+                                    className="
+
+px-3 py-1
+
+text-xs sm:text-sm
+
+rounded-lg
+
+bg-purple-500/10
+
+border border-purple-400/30
+
+text-purple-200
+
+"
+
+                                >
+
+                                    {tech}
+
+                                </span>
+
+                            ))}
+
+                        </div>
+
+
+
+                        {/* BUTTONS */}
+
+                        <div className="flex flex-col sm:flex-row gap-3 pt-3">
+
+                            {project.github && (
+
+                                <a
+
+                                    href={project.github}
+
+                                    target="_blank"
+
+                                    rel="noreferrer"
+
+                                    className="
+
+text-center
+
+px-5 py-3
+
+rounded-lg
+
+bg-gradient-to-r
+
+from-purple-600
+
+to-fuchsia-500
+
+hover:scale-105
+
+transition
+
+"
+
+                                >
+
+                                    GitHub
+
+                                </a>
+
+                            )}
+
+
+
+                            {project.status === "coming" || !project.live ? (
+
+                                <span
+
+                                    className="
+
+text-center
+
+px-5 py-3
+
+rounded-lg
+
+bg-yellow-500/10
+
+border border-yellow-400/40
+
+text-yellow-400
+
+"
+
+                                >
+
+                                    Coming Soon
+
+                                </span>
+
+                            ) : (
+
+                                <a
+
+                                    href={project.live}
+
+                                    target="_blank"
+
+                                    rel="noreferrer"
+
+                                    className="
+
+text-center
+
+px-5 py-3
+
+rounded-lg
+
+bg-gradient-to-r
+
+from-cyan-500
+
+to-teal-400
+
+hover:scale-105
+
+transition
+
+"
+
+                                >
+
+                                    Live Demo
+
+                                </a>
+
+                            )}
+
+
+                            <button
+
+                                onClick={close}
+
+                                className="
+
+px-5 py-3
+
+rounded-lg
+
+bg-white/10
+
+hover:bg-white/20
+
+transition
+
+"
+
                             >
-                                GitHub
-                            </a>
-                        )}
 
-                        {project.status === "coming" || !project.live ? (
-                            <span className="px-4 py-2 bg-yellow-500/10 border border-yellow-500 text-yellow-400 rounded font-semibold">
-                                Coming Soon
-                            </span>
-                        ) : (
-                            <a
-                                href={project.live}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="px-4 py-2 bg-cyan-600 rounded hover:opacity-80"
-                            >
-                                Live Demo
-                            </a>
-                        )}
+                                Close
 
-                        <button
-                            onClick={close}
-                            className="px-4 py-2 bg-gray-800 rounded hover:opacity-80"
-                        >
-                            Close
-                        </button>
+                            </button>
+
+                        </div>
 
                     </div>
 
+                </motion.div>
 
-                </div>
             </motion.div>
-        </motion.div>
+
+        </AnimatePresence>
+
     );
+
 };
 
 export default ProjectModal;
