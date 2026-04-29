@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
 import Tilt from "react-parallax-tilt";
-import profile from "../assets/profile.jpg";
+import profile from "../assets/profile.webp";
 
 const AboutV2 = () => {
     return (
@@ -117,7 +117,7 @@ const AboutV2 = () => {
                                     sequence={[
                                         "Frontend Developer",
                                         2000,
-                                        "React Specialist",
+                                        "React Enthusiast",
                                         2000,
                                         "UI Enthusiast",
                                         2000,
@@ -129,14 +129,14 @@ const AboutV2 = () => {
                         </h3>
 
                         <p className="mt-4 text-gray-300 leading-relaxed">
-                            I'm a dedicated developer focused on building immersive,
+                            Frontend-focused Full-Stack Developer with hands-on experience in building modern, responsive web applications and I am a dedicated developer focused on building immersive,
                             high-performance web applications. I love turning complex ideas
                             into elegant digital experiences that feel fast, modern, and intuitive.
                         </p>
 
                         <p className="mt-4 text-gray-400 leading-relaxed">
-                            With strong expertise in React, Node.js, and scalable architecture,
-                            I design products that balance performance, usability, and visual polish.
+                            I am skilled in crafting smooth user experiences using React, Tailwind CSS, and Framer Motion, with a strong focus on clean UI and performance.With strong expertise in React, Node.js, and scalable architecture and I design products that balance performance, usability, and visual polish.
+                            
                         </p>
 
                         <div className="grid sm:grid-cols-2 gap-6 mt-10">

@@ -17,8 +17,8 @@ const education = [
         desc: "Built strong foundation in computer science, programming, and full-stack development.",
     },
     {
-        title: "Higher Secondary (12th)",
-        org: "Delhi Public School, Kanpur",
+        title: "Senior Secondary (12th) (PCM)",
+        org: "Delhi Public School,Azaad Nagar Kanpur",
         year: "2020 – 2021",
         desc: "Focused on mathematics and computing fundamentals.",
     },
@@ -41,9 +41,9 @@ const experience = [
         ],
     },
     {
-        title: "Web Development Intern",
-        org: "ApexPlanet Software",
-        year: "2025",
+        title: "Web Developer Internship",
+        org: "Infosys Springboard Pvt Ltd",
+        year: "Nov 2025 - Jan 2026",
         desc: "Optimized frontend performance and delivered production-ready UI systems.",
         skills: [
             "Responsive UI",
@@ -51,6 +51,12 @@ const experience = [
             "React",
             "API Integration",
             "Debugging",
+            "Streamlit",
+            "OpenCv",
+            "YOLO (Ultralytics)",
+            "gtts",
+            "Python",
+            "Numpy",
         ],
     },
 ];
