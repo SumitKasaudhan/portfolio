@@ -1,7 +1,6 @@
 import NavbarV2 from "../components/NavbarV2";
 import HeroV2 from "../sections/HeroV2";
 import AboutV2 from "../sections/AboutV2";
-import StatsSection from "../sections/StatsSection";
 import ProjectsV2 from "../sections/ProjectsV2";
 import Skills from "../sections/Skills";
 import Contact from "../sections/Contact";
@@ -20,7 +19,6 @@ const Home = () => {
 
                 <HeroV2 />
                 <AboutV2 />
-                <StatsSection />
                 <ProjectsV2 />
                 <Skills />
                 <EducationExperience />
