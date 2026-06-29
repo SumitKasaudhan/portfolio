@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import API from "../services/api";
 import ProjectModal from "../components/ProjectModal";
 
-/* ── tiny CSS injected once ── */
 const injectStyles = () => {
     if (document.getElementById("proj-styles")) return;
     const s = document.createElement("style");
@@ -26,10 +25,8 @@ const injectStyles = () => {
             pointer-events: none;
         }
         .proj-card:hover::before { opacity: 1; }
-
         .proj-img-wrap img { transition: transform 0.5s ease; }
         .proj-card:hover .proj-img-wrap img { transform: scale(1.06); }
-
         .proj-shine {
             position: absolute;
             top: 0; left: -75%;
@@ -40,7 +37,6 @@ const injectStyles = () => {
             pointer-events: none;
         }
         .proj-card:hover .proj-shine { left: 130%; }
-
         .proj-tag {
             display: inline-flex;
             align-items: center;
@@ -58,7 +54,6 @@ const injectStyles = () => {
             background: rgba(139,92,246,0.2);
             border-color: rgba(139,92,246,0.38);
         }
-
         .proj-arrow {
             display: inline-flex;
             align-items: center;
@@ -76,28 +71,111 @@ const injectStyles = () => {
             transform: translate(2px, -2px);
         }
 
+        /* ── Premium Skeleton ── */
+        @keyframes sk-shimmer {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        @keyframes sk-pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.5; }
+        }
+        .sk-card {
+            border-radius: 18px;
+            overflow: hidden;
+            background: #0a0a1a;
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: sk-pulse 2s ease-in-out infinite;
+        }
+        .sk-shimmer {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255,255,255,0.04);
+        }
+        .sk-shimmer::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(103,232,249,0.06) 40%,
+                rgba(167,139,250,0.06) 60%,
+                transparent 100%
+            );
+            animation: sk-shimmer 1.8s ease-in-out infinite;
+        }
+        .sk-card:nth-child(2) { animation-delay: 0.15s; }
+        .sk-card:nth-child(3) { animation-delay: 0.3s;  }
+        .sk-card:nth-child(4) { animation-delay: 0.1s;  }
+        .sk-card:nth-child(5) { animation-delay: 0.25s; }
+        .sk-card:nth-child(6) { animation-delay: 0.4s;  }
+        .sk-card:nth-child(2) .sk-shimmer::after { animation-delay: 0.15s; }
+        .sk-card:nth-child(3) .sk-shimmer::after { animation-delay: 0.3s;  }
+
         @media (prefers-reduced-motion: reduce) {
-            .proj-card::before,
-            .proj-shine,
-            .proj-img-wrap img,
-            .proj-arrow { transition: none !important; }
+            .proj-card::before, .proj-shine,
+            .proj-img-wrap img, .proj-arrow { transition: none !important; }
+            .sk-card { animation: none; }
+            .sk-shimmer::after { animation: none; }
         }
     `;
     document.head.appendChild(s);
 };
 
-/* ── skeleton loader ── */
+/* ── Premium Skeleton Card ── */
 const SkeletonCard = () => (
-    <div className="rounded-[18px] overflow-hidden bg-[#0c0c1e] border border-white/8 animate-pulse">
-        <div className="h-52 bg-white/5" />
-        <div className="p-5 space-y-3">
-            <div className="h-4 bg-white/8 rounded w-2/3" />
-            <div className="h-3 bg-white/5 rounded w-full" />
-            <div className="h-3 bg-white/5 rounded w-4/5" />
-            <div className="flex gap-2 mt-4">
-                <div className="h-5 w-14 bg-white/5 rounded" />
-                <div className="h-5 w-16 bg-white/5 rounded" />
-                <div className="h-5 w-12 bg-white/5 rounded" />
+    <div className="sk-card">
+        {/* image area */}
+        <div className="sk-shimmer" style={{ height: "208px" }}>
+            {/* number badge placeholder */}
+            <div style={{
+                position: "absolute", top: "12px", left: "12px",
+                width: "28px", height: "28px", borderRadius: "50%",
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.06)",
+            }} />
+            {/* bottom fade like real card */}
+            <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(to top, #0a0a1a, transparent)",
+            }} />
+        </div>
+
+        {/* content area */}
+        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+
+            {/* title row */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
+                <div className="sk-shimmer" style={{ height: "18px", borderRadius: "6px", flex: 1 }} />
+                {/* arrow placeholder */}
+                <div style={{
+                    width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0,
+                    background: "rgba(34,211,238,0.05)",
+                    border: "1px solid rgba(34,211,238,0.08)",
+                }} />
+            </div>
+
+            {/* description lines */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div className="sk-shimmer" style={{ height: "13px", borderRadius: "4px", width: "100%" }} />
+                <div className="sk-shimmer" style={{ height: "13px", borderRadius: "4px", width: "78%" }} />
+            </div>
+
+            {/* tag row */}
+            <div style={{ display: "flex", gap: "6px", marginTop: "4px" }}>
+                {[52, 64, 48].map((w, i) => (
+                    <div
+                        key={i}
+                        className="sk-shimmer"
+                        style={{
+                            height: "22px",
+                            width: `${w}px`,
+                            borderRadius: "6px",
+                            border: "1px solid rgba(139,92,246,0.1)",
+                        }}
+                    />
+                ))}
             </div>
         </div>
     </div>
@@ -117,14 +195,11 @@ const IndexBadge = ({ n }) => (
     </div>
 );
 
-/* ══════════════════════════════════════
-   MAIN COMPONENT
-══════════════════════════════════════ */
 const ProjectsV2 = () => {
-    const [projects, setProjects]   = useState([]);
-    const [selected, setSelected]   = useState(null);
-    const [loading,  setLoading]    = useState(true);
-    const [canHover, setCanHover]   = useState(true);
+    const [projects, setProjects] = useState([]);
+    const [selected, setSelected] = useState(null);
+    const [loading,  setLoading]  = useState(true);
+    const [canHover, setCanHover] = useState(true);
 
     useEffect(() => {
         injectStyles();
@@ -150,7 +225,6 @@ const ProjectsV2 = () => {
     return (
         <section id="projects" className="py-24 px-4 md:px-6 bg-black overflow-hidden">
 
-            {/* ── section header ── */}
             <motion.div
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -158,24 +232,15 @@ const ProjectsV2 = () => {
                 transition={{ duration: 0.5 }}
                 className="text-center mb-16"
             >
-                {/* eyebrow */}
                 <p className="text-xs uppercase tracking-[0.2em] text-purple-400 mb-3 font-medium">
                     What I've built
                 </p>
-
-                <h2 className="
-                    text-4xl md:text-5xl font-bold
-                    text-transparent bg-clip-text
-                    bg-gradient-to-r from-cyan-300 via-cyan-400 to-teal-300
-                ">
+                <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-cyan-400 to-teal-300">
                     Featured Projects
                 </h2>
-
-                {/* subtle underline accent */}
                 <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
             </motion.div>
 
-            {/* ── grid ── */}
             <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
 
                 {loading && [0,1,2,3,4,5].map(i => <SkeletonCard key={i} />)}
@@ -193,14 +258,9 @@ const ProjectsV2 = () => {
                         transition={{ duration: 0.4, delay: index * 0.06 }}
                         whileHover={canHover ? { y: -5, transition: { duration: 0.2 } } : {}}
                         onClick={() => openModal(project)}
-                        className="proj-card rounded-[18px] overflow-hidden cursor-pointer
-                            bg-[#0c0c1e]
-                            border border-white/[0.07]
-                            will-change-transform
-                        "
+                        className="proj-card rounded-[18px] overflow-hidden cursor-pointer bg-[#0c0c1e] border border-white/[0.07] will-change-transform"
                         style={{ isolation: "isolate" }}
                     >
-                        {/* ── image zone ── */}
                         <div className="proj-img-wrap relative h-52 overflow-hidden bg-black">
                             <img
                                 src={project.image || "https://placehold.co/600x300/080818/333?text=Project"}
@@ -209,22 +269,14 @@ const ProjectsV2 = () => {
                                 loading="lazy"
                                 decoding="async"
                             />
-                            {/* gradient fade at bottom */}
                             <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c1e] via-transparent to-transparent" />
-
-                            {/* number badge */}
                             <IndexBadge n={index + 1} />
-
-                            {/* shine sweep */}
                             <div className="proj-shine" />
                         </div>
 
-                        {/* ── content zone ── */}
                         <div className="p-5 flex flex-col gap-3">
-
-                            {/* title row */}
                             <div className="flex items-start justify-between gap-2">
-                                <h3 className="text-base md:text-lg font-semibold text-white leading-snug group-hover:text-cyan-300 transition-colors duration-200 line-clamp-1">
+                                <h3 className="text-base md:text-lg font-semibold text-white leading-snug line-clamp-1">
                                     {project.title}
                                 </h3>
                                 <div className="proj-arrow shrink-0">↗</div>
@@ -234,7 +286,6 @@ const ProjectsV2 = () => {
                                 {project.description}
                             </p>
 
-                            {/* tech tags */}
                             <div className="flex flex-wrap gap-1.5 mt-1">
                                 {(project.techStack || []).slice(0, 4).map((tech, idx) => (
                                     <span key={idx} className="proj-tag">{tech}</span>

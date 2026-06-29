@@ -10,9 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.1",
-    "@react-three/postprocessing": "^3.0.4",
     "axios": "^1.13.5",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^12.34.0",
@@ -24,7 +21,6 @@
     "react-parallax-tilt": "^1.7.319",
     "react-router-dom": "^7.13.0",
     "react-type-animation": "^3.2.0",
-    "three": "^0.184.0",
     "three-stdlib": "^2.36.1",
     "tsparticles-engine": "^2.12.0"
   },

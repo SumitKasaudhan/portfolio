@@ -6,6 +6,8 @@ import Skills from "../sections/Skills";
 import Contact from "../sections/Contact";
 import FooterV2 from "../components/FooterV2";
 import EducationExperience from "../sections/EducationExperience";
+import Certifications from "../components/Certifications";
+
 
 const Home = () => {
     return (
@@ -22,6 +24,7 @@ const Home = () => {
                 <ProjectsV2 />
                 <Skills />
                 <EducationExperience />
+                <Certifications />
                 <Contact />
 
             </main>
