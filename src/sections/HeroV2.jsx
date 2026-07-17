@@ -1,8 +1,8 @@
-import { lazy, Suspense, useCallback, useState } from "react";
+import { lazy, Suspense, useCallback, useState, forwardRef } from "react";
 
 const HeroParticles = lazy(() => import("../components/HeroParticles"));
 
-const HeroV2 = () => {
+const HeroV2 = forwardRef((props, ref) => {
   const scrollToSection = useCallback((id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -13,6 +13,7 @@ const HeroV2 = () => {
 
   return (
     <section
+      ref={ref}
       id="home"
       className="
         relative isolate
@@ -166,6 +167,8 @@ const HeroV2 = () => {
       </div>
     </section>
   );
-};
+});
+
+HeroV2.displayName = "HeroV2";
 
 export default HeroV2;

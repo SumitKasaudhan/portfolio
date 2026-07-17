@@ -40,3 +40,14 @@
     transform: rotate(360deg);
   }
 }
+
+/* Cursor hide for desktop, normal on mobile/touch */
+body {
+  cursor: none;
+}
+
+@media (hover: none) {
+  body {
+    cursor: auto;
+  }
+}
