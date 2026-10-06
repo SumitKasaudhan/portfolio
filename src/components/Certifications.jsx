@@ -25,14 +25,14 @@ const certifications = [
   },
   {
     id: 3,
-    title: "Web Developer Internship",
+    title: "Software Developer Internship",
     issuer: "Infosys Springboard Pvt Ltd.",
-    date: "Nov 2025- Jan 2026",
+    date: "Feb 2026- April 2026",
     icon: "🎓",
     color: "#f59e0b",
     tags: ["Python", "TensorFlow", "OpenCV", "React.js" , "YOLO" , "Streamlit" , "NumPy" , "API Integration" ],
     credentialId: "INFOSYS-AI-2025",
-    link: "https://drive.google.com/file/d/1M4zOcaM7oswWBkrIpyMYmiMJgGpU1D9t/view?usp=sharing",
+    link: "https://drive.google.com/file/d/1dHgpvkYZmNSGZqnYR2P1bB5LnA49WK2e/view?usp=sharing",
   },
   {
     id: 4,

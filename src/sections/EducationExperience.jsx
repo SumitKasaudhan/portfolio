@@ -7,8 +7,8 @@ const education = [
     {
         title: "Master of Computer Applications (MCA)",
         org: "Lovely Professional University",
-        year: "2024 – 2026 (Pursuing)",
-        badge: "Currently Enrolled",
+        year: "2024 – 2026 ",
+        badge: "Completed",
         desc: "Specializing in scalable system design, advanced algorithms, and modern full-stack development. Actively building production-grade projects alongside coursework.",
         highlights: ["System Design", "Advanced DSA", "Cloud Architecture", "Research Methods"],
     },
@@ -44,9 +44,9 @@ const experience = [
         skills: ["React", "Tailwind CSS", "Framer Motion", "JavaScript", "UI Design"],
     },
     {
-        title: "Web Developer Intern",
+        title: "Software Developer Intern",
         org: "Infosys Springboard",
-        year: "Nov 2025 – Jan 2026",
+        year: "Feb 2026 – April 2026",
         type: "Internship",
         bullets: [
             "Optimized Streamlit + OpenCV pipeline for real-time object detection (YOLO), achieving ~25% faster inference on edge-like hardware.",

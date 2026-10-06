@@ -32,8 +32,8 @@ const experience = [
     color: "cyan",
   },
   {
-    range: "Nov 2025 – Jan 2026",
-    title: "Web Developer Intern",
+    range: "Feb 2026 – April 2026",
+    title: "Software Developer Intern",
     org: "Infosys Springboard Pvt. Ltd.",
     detail: "Real-time OpenCV + TensorFlow pipeline · inference latency −25%",
     color: "purple",
