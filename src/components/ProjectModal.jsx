@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const GitHubIcon = () => (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -8,15 +8,53 @@ const GitHubIcon = () => (
 );
 
 const ProjectModal = ({ project, close }) => {
+    const backdropRef = useRef(null);
+    const boxRef = useRef(null);
 
     useEffect(() => {
         if (!project) return;
+
+        const html = document.documentElement;
+        const body = document.body;
+
+        // ── Save previous styles so we can restore exactly ──
+        const prev = {
+            htmlOverflow: html.style.overflow,
+            bodyOverflow: body.style.overflow,
+            bodyPaddingRight: body.style.paddingRight,
+        };
+
+        // ── Lock page scroll (html + body), avoid layout jump ──
+        const scrollbarWidth = window.innerWidth - html.clientWidth;
+        html.style.overflow = "hidden";
+        body.style.overflow = "hidden";
+        if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
+
+        // ── Close on Escape ──
         const esc = (e) => { if (e.key === "Escape") close(); };
-        document.body.style.overflow = "hidden";
         window.addEventListener("keydown", esc);
+
+        // ── Block wheel/touch scroll that starts OUTSIDE the modal box ──
+        const blockOutside = (e) => {
+            if (!boxRef.current || !boxRef.current.contains(e.target)) {
+                e.preventDefault();
+            }
+        };
+        const backdrop = backdropRef.current;
+        if (backdrop) {
+            backdrop.addEventListener("wheel", blockOutside, { passive: false });
+            backdrop.addEventListener("touchmove", blockOutside, { passive: false });
+        }
+
         return () => {
-            document.body.style.overflow = "";
+            html.style.overflow = prev.htmlOverflow;
+            body.style.overflow = prev.bodyOverflow;
+            body.style.paddingRight = prev.bodyPaddingRight;
             window.removeEventListener("keydown", esc);
+            if (backdrop) {
+                backdrop.removeEventListener("wheel", blockOutside);
+                backdrop.removeEventListener("touchmove", blockOutside);
+            }
         };
     }, [project, close]);
 
@@ -25,6 +63,7 @@ const ProjectModal = ({ project, close }) => {
             {project && (
                 /* ── BACKDROP — always center on every device ── */
                 <motion.div
+                    ref={backdropRef}
                     key="modal-backdrop"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -49,12 +88,16 @@ const ProjectModal = ({ project, close }) => {
                 >
                     {/* ── MODAL BOX ── */}
                     <motion.div
+                        ref={boxRef}
                         key="modal-box"
+                        data-lenis-prevent
                         initial={{ scale: 0.94, opacity: 0, y: 16 }}
                         animate={{ scale: 1,    opacity: 1, y: 0  }}
                         exit={{   scale: 0.96,  opacity: 0, y: 8  }}
                         transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                         onClick={(e) => e.stopPropagation()}
+                        onWheel={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
                         style={{
                             position: "relative",
                             width: "100%",
@@ -109,6 +152,7 @@ const ProjectModal = ({ project, close }) => {
                             overflowX: "hidden",
                             background: "#000",
                             WebkitOverflowScrolling: "touch",
+                            overscrollBehavior: "contain",
                         }}>
                             <img
                                 src={project.image}
@@ -130,6 +174,7 @@ const ProjectModal = ({ project, close }) => {
                             flex: 1,
                             overflowY: "auto",
                             WebkitOverflowScrolling: "touch",
+                            overscrollBehavior: "contain",
                             padding: "clamp(16px, 4vw, 32px)",
                             paddingTop: "20px",
                             display: "flex",

@@ -1,9 +1,12 @@
 // src/components/Cursor.jsx
 // Elite HUD Cursor — Iron Heart triangle-core arc reactor
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
+const CURSOR_Z = 2147483647; // max z-index — always above modals/overlays
 
 export default function Cursor() {
-  const wrapRef    = useRef(null);
+  const wrapRef     = useRef(null);
   const coreRef     = useRef(null);
   const triRef      = useRef(null);
   const ringOuterRef= useRef(null);
@@ -23,6 +26,11 @@ export default function Cursor() {
     const trail    = trailRef.current;
     if (!wrap || !core || !tri || !ringOut || !ringIn || !seg || !bracket || !trail) return;
 
+    // Hide native cursor EVERYWHERE (incl. modal buttons with cursor:pointer)
+    const hideStyle = document.createElement("style");
+    hideStyle.setAttribute("data-custom-cursor", "true");
+    hideStyle.textContent = `*, *::before, *::after { cursor: none !important; }`;
+    document.head.appendChild(hideStyle);
     document.body.style.cursor = "none";
 
     let mouseX = -100, mouseY = -100;
@@ -35,25 +43,30 @@ export default function Cursor() {
     let isHovering = false;
     let isClicking = false;
 
+    const INTERACTIVE = "a, button, [role='button'], input, textarea, select, label";
+
     const onMove = (e) => { mouseX = e.clientX; mouseY = e.clientY; };
     const onPointerOver = (e) => {
-      if (e.target.closest("a, button, [role='button'], input, textarea, select, label")) {
+      if (e.target.closest && e.target.closest(INTERACTIVE)) {
         isHovering = true;
       }
     };
     const onPointerOut = (e) => {
-      if (e.target.closest("a, button, [role='button'], input, textarea, select, label")) {
+      if (e.target.closest && e.target.closest(INTERACTIVE)) {
         isHovering = false;
       }
     };
     const onMouseDown = () => { isClicking = true; };
     const onMouseUp   = () => { isClicking = false; };
+    const resetState  = () => { isHovering = false; isClicking = false; };
 
     document.addEventListener("mousemove",   onMove,        { passive: true });
     document.addEventListener("pointerover", onPointerOver, { passive: true });
     document.addEventListener("pointerout",  onPointerOut,  { passive: true });
     document.addEventListener("mousedown",   onMouseDown,   { passive: true });
     document.addEventListener("mouseup",     onMouseUp,     { passive: true });
+    document.documentElement.addEventListener("mouseleave", resetState);
+    window.addEventListener("blur", resetState);
 
     const LAG_L = 0.18;
     const TRAIL_L = 0.08;
@@ -126,11 +139,14 @@ export default function Cursor() {
     return () => {
       cancelAnimationFrame(rafId);
       document.body.style.cursor = "";
+      if (hideStyle.parentNode) hideStyle.parentNode.removeChild(hideStyle);
       document.removeEventListener("mousemove",   onMove);
       document.removeEventListener("pointerover", onPointerOver);
       document.removeEventListener("pointerout",  onPointerOut);
       document.removeEventListener("mousedown",   onMouseDown);
       document.removeEventListener("mouseup",     onMouseUp);
+      document.documentElement.removeEventListener("mouseleave", resetState);
+      window.removeEventListener("blur", resetState);
     };
   }, []);
 
@@ -139,12 +155,24 @@ export default function Cursor() {
     top: 0,
     left: 0,
     pointerEvents: "none",
-    zIndex: 9999,
+    zIndex: CURSOR_Z,
     willChange: "transform",
   };
 
-  return (
-    <div ref={wrapRef}>
+  // Portal → renders directly under <body>, outside any parent stacking context
+  return createPortal(
+    <div
+      ref={wrapRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+        pointerEvents: "none",
+        zIndex: CURSOR_Z,
+      }}
+    >
       {/* Ambient breathing trail (furthest back) */}
       <div
         ref={trailRef}
@@ -274,6 +302,7 @@ export default function Cursor() {
           background: "#fff",
         }}
       />
-    </div>
+    </div>,
+    document.body
   );
 }

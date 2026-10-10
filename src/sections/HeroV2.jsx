@@ -64,7 +64,7 @@ const HeroV2 = forwardRef((props, ref) => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
           </span>
-          Open to Work
+          Open to Work&nbsp;&middot;&nbsp;Available Immediately
         </span>
 
         {/* Heading */}
@@ -98,7 +98,7 @@ const HeroV2 = forwardRef((props, ref) => {
             cursor-default select-none
           "
         >
-          Front-End Developer&nbsp;&bull;&nbsp;React Enthusiast&nbsp;&bull;&nbsp;UI/UX Aficionado
+          Full-Stack Developer&nbsp;&bull;&nbsp;AI Application Builder&nbsp;&bull;&nbsp;MCA Graduate 2026
         </p>
 
         {/* CTA Buttons */}

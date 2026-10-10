@@ -20,7 +20,7 @@ const stats = [
   { value: "4+",  label: "Projects Built" },
   { value: "2+",  label: "Internships" },
   { value: "15+", label: "Technologies" },
-  { value: "1K+", label: "VU Load Tested" },
+  { value: "35+", label: "Endpoints Load Tested" },
 ];
 
 const experience = [
@@ -34,7 +34,7 @@ const experience = [
   {
     range: "Feb 2026 – April 2026",
     title: "Software Developer Intern",
-    org: "Infosys Springboard Pvt. Ltd.",
+    org: "Infosys Springboard",
     detail: "Real-time OpenCV + TensorFlow pipeline · inference latency −25%",
     color: "purple",
   },
@@ -92,8 +92,8 @@ const AboutV2 = () => {
         </span>
         <h2 className="heading-glow text-4xl md:text-5xl font-bold">About Me</h2>
         <p className="mt-4 text-gray-400 text-sm md:text-base max-w-xl mx-auto">
-          Full-Stack Developer &amp; MCA Fresher — shipping production systems,
-          not tutorials.
+          Full-Stack Developer &amp; MCA Graduate Fresher — shipping production
+          systems, not tutorials.
         </p>
       </motion.div>
 
@@ -157,10 +157,10 @@ const AboutV2 = () => {
               <span className="text-cyan-300 font-semibold">
                 <TypeAnimation
                   sequence={[
-                    "Frontend Developer", 2000,
-                    "React Enthusiast",   2000,
-                    "SaaS Builder",       2000,
-                    "MCA Fresher",        2000,
+                    "Full-Stack Developer", 2000,
+                    "SaaS Builder",         2000,
+                    "AI Product Builder",   2000,
+                    "MCA Graduate Fresher", 2000,
                   ]}
                   speed={50}
                   repeat={Infinity}
@@ -202,13 +202,20 @@ const AboutV2 = () => {
           {/* Bio */}
           <motion.div variants={fadeUp}>
             <p className="text-gray-300 leading-relaxed text-sm md:text-base">
-              Results-driven full-stack developer with a strong grounding in
-              DSA, OOP, DBMS, operating systems and computer networks — the
-              fundamentals that hold up once the framework of the month
-              changes. I've run two production internships in parallel while
-              independently shipping a live B2B SaaS with real paying
-              subscribers, end to end: architecture, auth, payments, and a
-              1,000-VU load test to prove it holds under pressure.
+              MCA graduate and fresher with hands-on experience building
+              complete products end to end: architecture, authentication,
+              payments, AI features and deployment. I designed and built{" "}
+              <span className="text-cyan-300 font-semibold">Sentinel AI</span>,
+              a live B2B cybersecurity SaaS with paying subscribers, billing
+              webhooks, a Clerk-secured API and a Gemini-powered remediation
+              engine, load-tested with k6 across 35+ endpoints. I have also
+              completed two internships: React and TypeScript at Graphura, and
+              a real-time object detection platform for visually impaired users
+              at Infosys Springboard (Python, OpenCV, TensorFlow). I work
+              across Next.js, Node.js, PostgreSQL and Python, backed by strong
+              fundamentals in DSA, OOP, DBMS and networks. Available
+              immediately for full-time roles in full-stack, security-focused
+              or AI-driven product engineering.
             </p>
           </motion.div>
 

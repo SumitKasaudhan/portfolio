@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 const education = [
     {
-        title: "Master of Computer Applications (MCA)",
+        title: "Master's of Computer Applications (MCA)",
         org: "Lovely Professional University",
         year: "2024 – 2026 ",
         badge: "Completed",
@@ -13,7 +13,7 @@ const education = [
         highlights: ["System Design", "Advanced DSA", "Cloud Architecture", "Research Methods"],
     },
     {
-        title: "Bachelor of Computer Applications (BCA)",
+        title: "Bachelor's of Computer Applications (BCA)",
         org: "Chhatrapati Shahu Ji Maharaj University",
         year: "2021 – 2024",
         badge: "Completed",
