@@ -98,7 +98,7 @@ const HeroV2 = forwardRef((props, ref) => {
             cursor-default select-none
           "
         >
-          Full-Stack Developer&nbsp;&bull;&nbsp;AI Application Builder&nbsp;&bull;&nbsp;MCA Graduate 2026
+          Software Developer&nbsp;&bull;&nbsp;AI Application Builder&nbsp;&bull;&nbsp;MCA Graduate 2026
         </p>
 
         {/* CTA Buttons */}

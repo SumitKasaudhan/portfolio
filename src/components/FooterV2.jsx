@@ -128,7 +128,7 @@ const Footer = () => {
                             <div className="flex items-center gap-3 mt-2">
                                 <div className="h-[1px] w-10 bg-gradient-to-r from-cyan-400 to-transparent" />
                                 <p className="text-[10px] tracking-[3.5px] text-cyan-400/70 uppercase font-semibold">
-                                    Full Stack Developer
+                                    Software Developer
                                 </p>
                             </div>
                         </div>

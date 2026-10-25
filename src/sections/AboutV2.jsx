@@ -92,7 +92,7 @@ const AboutV2 = () => {
         </span>
         <h2 className="heading-glow text-4xl md:text-5xl font-bold">About Me</h2>
         <p className="mt-4 text-gray-400 text-sm md:text-base max-w-xl mx-auto">
-          Full-Stack Developer &amp; MCA Graduate Fresher — shipping production
+          Software Developer &amp; MCA Graduate Fresher — shipping production
           systems, not tutorials.
         </p>
       </motion.div>
@@ -150,7 +150,7 @@ const AboutV2 = () => {
           {/* ID plate */}
           <div className="text-center">
             <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-gray-500 mb-1">
-              Clearance · Full-Stack
+              Clearance · Software
             </p>
             <p className="text-sm text-gray-300">
               I am a{" "}
