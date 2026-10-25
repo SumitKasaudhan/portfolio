@@ -1,165 +1,269 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import "../styles/FooterBigText.css";
 
 /**
- * Premium big brand text for the footer.
- * - Scroll karke footer tak pahuchne par text smooth fade-up reveal hota hai
- * - Glow sirf cursor/touch par (heavy filter tab hi chalta hai)
- * - Safari/iPad safe (textLength use nahi karta), performance optimized
+ * Footer big brand text — CANVAS version (light + smooth, har device pe same).
+ *
+ * Kyun canvas: pehle SVG filters/masks har frame re-render hote the, isliye
+ * iPad/mobile pe lag aata tha. Ab text sirf EK baar draw hota hai (cache),
+ * aur glow tab hi redraw hota hai jab cursor/touch text par ho.
+ *
+ * - Page load pe hi text ready rehta hai (koi delay / reveal animation nahi)
+ * - Idle me ZERO CPU/GPU kaam
+ * - Glow cursor/touch ke paas ke chhote area me hi redraw hota hai
  * Usage: <FooterBigText />  (footer ke andar, max-w container ke BAHAR)
  */
-const VB_X = -10;
-const VB_W = 1420;
-const TEXT_H = 250;
-const BASE_Y = 218; // text baseline
+const DW = 1420; // design width
+const TEXT_X = 10;
+const TEXT_W = 1400;
+const BASE_Y = 218; // baseline
 const REFLECT_H = 96;
-const VB_H = BASE_Y + REFLECT_H;
-
+const DH = BASE_Y + REFLECT_H; // design height
 const HIT_TOP = 20;
 const HIT_BOTTOM = BASE_Y + 40;
+const CAP_TOP = BASE_Y - 192;
+
+const FONT_FAMILY = 'Inter, Montserrat, "Segoe UI", system-ui, sans-serif';
+const FONT = `900 262px ${FONT_FAMILY}`;
+
+const setFont = (ctx) => {
+  ctx.font = FONT;
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "5px";
+  ctx.textBaseline = "alphabetic";
+  ctx.lineJoin = "round";
+};
 
 export default function FooterBigText({ text = "SUMITKASAUDHAN" }) {
   const wrapRef = useRef(null);
-  const svgRef = useRef(null);
-  const spotRef = useRef(null);
-  const floorRef = useRef(null);
-  const baseTextRef = useRef(null);
+  const canvasRef = useRef(null);
 
-  const [sx, setSx] = useState(0.55);
-  const [inView, setInView] = useState(false);
-  // touch devices (iPad/mobile) par halka filter + no continuous sheen
-  const [isCoarse] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      !!window.matchMedia &&
-      window.matchMedia("(pointer: coarse)").matches
-  );
-
-  /* ---------- width fit (Safari-safe, textLength ki jagah) ---------- */
-  useLayoutEffect(() => {
-    const measure = () => {
-      const el = baseTextRef.current;
-      if (!el) return;
-      let w = 0;
-      try {
-        w = el.getBBox().width;
-      } catch (_) {
-        w = 0;
-      }
-      if (w > 0) {
-        const next = 1400 / w;
-        setSx((prev) => (Math.abs(prev - next) < 0.0005 ? prev : next));
-      }
-    };
-
-    measure();
-    const t1 = setTimeout(measure, 300);
-    const t2 = setTimeout(measure, 1200);
-    if (document.fonts) {
-      document.fonts.ready.then(measure).catch(() => {});
-      document.fonts.addEventListener?.("loadingdone", measure);
-    }
-    window.addEventListener("load", measure);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      document.fonts?.removeEventListener?.("loadingdone", measure);
-      window.removeEventListener("load", measure);
-    };
-  }, [text]);
-
-  /* ---------- smooth scroll reveal (sirf ek baar) ---------- */
   useEffect(() => {
     const wrap = wrapRef.current;
-    if (!wrap) return;
-
-    if (!("IntersectionObserver" in window)) {
-      wrap.classList.add("is-visible");
-      setInView(true);
-      return;
-    }
-
-    let revealed = false;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        setInView(entry.isIntersecting);
-        if (entry.isIntersecting && !revealed) {
-          revealed = true;
-          // ek frame baad taaki transition smooth chale
-          requestAnimationFrame(() => wrap.classList.add("is-visible"));
-        }
-      },
-      { threshold: 0.05, rootMargin: "0px 0px -4% 0px" }
-    );
-    io.observe(wrap);
-    return () => io.disconnect();
-  }, []);
-
-  /* ---------- hover / touch glow ---------- */
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    const svg = svgRef.current;
-    if (!wrap || !svg) return;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
 
     const host = wrap.closest("footer") || wrap;
+    const mk = () => document.createElement("canvas");
+    const baseC = mk(); // cached: dim text + reflection + floor line
+    const hotC = mk(); // cached: bright glowing text
+    const tmpC = mk(); // spotlight scratch
+    const rflC = mk(); // reflection scratch
+    const scratch = mk(); // text measure
+    const mainCtx = canvas.getContext("2d");
 
-    const target = { x: -1000, y: -1000 };
+    let W = 0;
+    let H = 0;
+    let k = 1; // design unit -> device px
+    let sx = 1;
+    let tw = 1;
+    let ready = false;
+
     const cur = { x: -1000, y: -1000 };
-    let raf = 0;
-    let running = false;
+    const target = { x: -1000, y: -1000 };
+    let intensity = 0;
     let active = false;
+    let radius = 200;
+    let raf = 0;
     let hideTimer = 0;
 
-    const setSpot = (x, y) => {
-      const spot = spotRef.current;
-      const floor = floorRef.current;
-      if (spot) {
-        spot.setAttribute("cx", x);
-        spot.setAttribute("cy", y);
-        spot.setAttribute("fx", x);
-        spot.setAttribute("fy", y);
-      }
-      if (floor) floor.setAttribute("cx", x);
+    /* ---------------- static layers (sirf resize / font load pe) ---------------- */
+    const build = () => {
+      const cssW = canvas.clientWidth;
+      if (!cssW) return;
+
+      const sctx = scratch.getContext("2d");
+      setFont(sctx);
+      const newTw = sctx.measureText(text).width || 1;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const nk = (cssW / DW) * dpr;
+      const nW = Math.max(1, Math.round(DW * nk));
+      const nH = Math.max(1, Math.round(DH * nk));
+
+      if (ready && nW === W && nH === H && Math.abs(newTw - tw) < 0.01) return;
+
+      k = nk;
+      W = nW;
+      H = nH;
+      tw = newTw;
+      sx = TEXT_W / tw;
+
+      [canvas, baseC, hotC, tmpC].forEach((c) => {
+        c.width = W;
+        c.height = H;
+      });
+      rflC.width = W;
+      rflC.height = Math.max(1, Math.round(REFLECT_H * k));
+      const rh = rflC.height;
+
+      /* ----- base: dim glassy text + outline ----- */
+      const b = baseC.getContext("2d");
+      b.save();
+      b.setTransform(k * sx, 0, 0, k, TEXT_X * k, 0);
+      setFont(b);
+      const fg = b.createLinearGradient(0, CAP_TOP, 0, BASE_Y + 2);
+      fg.addColorStop(0, "rgba(230,251,255,0.36)");
+      fg.addColorStop(0.38, "rgba(34,211,238,0.26)");
+      fg.addColorStop(0.78, "rgba(14,116,144,0.14)");
+      fg.addColorStop(1, "rgba(11,18,32,0.04)");
+      b.fillStyle = fg;
+      b.fillText(text, 0, BASE_Y);
+      const sg = b.createLinearGradient(0, 0, tw, 0);
+      sg.addColorStop(0, "rgba(148,163,184,0.38)");
+      sg.addColorStop(0.55, "rgba(34,211,238,0.55)");
+      sg.addColorStop(1, "rgba(167,139,250,0.45)");
+      b.strokeStyle = sg;
+      b.lineWidth = 1.1;
+      b.strokeText(text, 0, BASE_Y);
+      b.restore();
+
+      /* ----- base: mirror reflection (faded) ----- */
+      const r = rflC.getContext("2d");
+      r.setTransform(1, 0, 0, 1, 0, 0);
+      r.clearRect(0, 0, W, rh);
+      r.save();
+      r.translate(0, rh);
+      r.scale(1, -1);
+      r.drawImage(baseC, 0, (BASE_Y - REFLECT_H) * k, W, rh, 0, 0, W, rh);
+      r.restore();
+      r.globalCompositeOperation = "destination-in";
+      const fade = r.createLinearGradient(0, 0, 0, rh);
+      fade.addColorStop(0, "rgba(0,0,0,0.5)");
+      fade.addColorStop(1, "rgba(0,0,0,0)");
+      r.fillStyle = fade;
+      r.fillRect(0, 0, W, rh);
+      r.globalCompositeOperation = "source-over";
+      b.drawImage(rflC, 0, BASE_Y * k);
+
+      /* ----- hot: bright text with baked glow ----- */
+      const h = hotC.getContext("2d");
+      h.save();
+      h.setTransform(k * sx, 0, 0, k, TEXT_X * k, 0);
+      setFont(h);
+      const hg = h.createLinearGradient(0, CAP_TOP, 0, BASE_Y + 2);
+      hg.addColorStop(0, "rgba(240,253,255,0.95)");
+      hg.addColorStop(0.45, "rgba(94,234,212,0.6)");
+      hg.addColorStop(1, "rgba(14,116,144,0.3)");
+      h.fillStyle = hg;
+      h.shadowColor = "rgba(34,211,238,0.9)";
+      h.shadowBlur = 30 * k;
+      h.fillText(text, 0, BASE_Y);
+      h.fillText(text, 0, BASE_Y);
+      h.shadowColor = "rgba(103,232,249,0.8)";
+      h.shadowBlur = 10 * k;
+      h.fillText(text, 0, BASE_Y);
+      h.shadowBlur = 0;
+      h.shadowColor = "transparent";
+      h.strokeStyle = "#cffafe";
+      h.lineWidth = 1.5;
+      h.strokeText(text, 0, BASE_Y);
+      h.fillText(text, 0, BASE_Y);
+      h.restore();
+
+      ready = true;
+      draw();
     };
+
+    /* ---------------- per-frame draw (sirf active hone par) ---------------- */
+    function draw() {
+      if (!W) return;
+      const m = mainCtx;
+      m.setTransform(1, 0, 0, 1, 0, 0);
+      m.globalAlpha = 1;
+      m.globalCompositeOperation = "source-over";
+      m.clearRect(0, 0, W, H);
+      m.drawImage(baseC, 0, 0);
+      if (intensity < 0.01) return;
+
+      const r = radius;
+      const cx = cur.x;
+      const cy = cur.y;
+      const bx0 = Math.max(0, Math.floor((cx - r) * k));
+      const bx1 = Math.min(W, Math.ceil((cx + r) * k));
+      const bw = bx1 - bx0;
+      if (bw <= 0) return;
+      const bh = Math.min(H, Math.ceil((BASE_Y + 24) * k));
+
+      // spotlight: sirf cursor ke aas-paas ka chhota area
+      const t = tmpC.getContext("2d");
+      t.setTransform(1, 0, 0, 1, 0, 0);
+      t.globalCompositeOperation = "source-over";
+      t.clearRect(bx0, 0, bw, bh);
+      t.drawImage(hotC, bx0, 0, bw, bh, bx0, 0, bw, bh);
+      t.globalCompositeOperation = "destination-in";
+      const g = t.createRadialGradient(cx * k, cy * k, 0, cx * k, cy * k, r * k);
+      g.addColorStop(0, "rgba(0,0,0,1)");
+      g.addColorStop(0.22, "rgba(0,0,0,0.9)");
+      g.addColorStop(0.48, "rgba(0,0,0,0.5)");
+      g.addColorStop(0.74, "rgba(0,0,0,0.14)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      t.fillStyle = g;
+      t.fillRect(bx0, 0, bw, bh);
+      t.globalCompositeOperation = "source-over";
+
+      m.globalAlpha = intensity;
+      m.drawImage(tmpC, bx0, 0, bw, bh, bx0, 0, bw, bh);
+
+      // glow reflection
+      const rh = rflC.height;
+      const rc = rflC.getContext("2d");
+      rc.setTransform(1, 0, 0, 1, 0, 0);
+      rc.globalCompositeOperation = "source-over";
+      rc.clearRect(bx0, 0, bw, rh);
+      rc.save();
+      rc.translate(0, rh);
+      rc.scale(1, -1);
+      rc.drawImage(tmpC, bx0, (BASE_Y - REFLECT_H) * k, bw, rh, bx0, 0, bw, rh);
+      rc.restore();
+      rc.globalCompositeOperation = "destination-in";
+      const fd = rc.createLinearGradient(0, 0, 0, rh);
+      fd.addColorStop(0, "rgba(0,0,0,0.5)");
+      fd.addColorStop(1, "rgba(0,0,0,0)");
+      rc.fillStyle = fd;
+      rc.fillRect(bx0, 0, bw, rh);
+      rc.globalCompositeOperation = "source-over";
+      m.drawImage(rflC, bx0, 0, bw, rh, bx0, BASE_Y * k, bw, rh);
+
+      m.globalAlpha = 1;
+    }
 
     const tick = () => {
+      raf = 0;
       const dx = target.x - cur.x;
       const dy = target.y - cur.y;
-      cur.x += dx * 0.2;
-      cur.y += dy * 0.2;
-      setSpot(cur.x, cur.y);
-      if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) {
-        raf = requestAnimationFrame(tick);
-      } else {
-        running = false;
+      const di = (active ? 1 : 0) - intensity;
+      cur.x += dx * 0.22;
+      cur.y += dy * 0.22;
+      intensity += di * 0.16;
+      const more = Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3 || Math.abs(di) > 0.01;
+      if (!more) {
+        cur.x = target.x;
+        cur.y = target.y;
+        intensity = active ? 1 : 0;
       }
+      draw();
+      if (more) raf = requestAnimationFrame(tick);
     };
     const kick = () => {
-      if (!running) {
-        running = true;
-        raf = requestAnimationFrame(tick);
-      }
+      if (!raf) raf = requestAnimationFrame(tick);
     };
 
-    const activate = () => {
-      clearTimeout(hideTimer);
-      active = true;
-      wrap.classList.add("is-active");
+    /* ---------------- input ---------------- */
+    const setActive = (v) => {
+      active = v;
+      kick();
     };
     const deactivate = (delay = 0) => {
       clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => {
-        active = false;
-        wrap.classList.remove("is-active");
-      }, delay);
+      hideTimer = setTimeout(() => setActive(false), delay);
     };
 
-    const handlePoint = (clientX, clientY, radius, touch) => {
-      const rect = svg.getBoundingClientRect();
-      const scale = VB_W / rect.width;
-      const x = VB_X + (clientX - rect.left) * scale;
-      const y = (clientY - rect.top) * scale;
-
+    const handlePoint = (clientX, clientY, r, touch) => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width) return;
+      const s = DW / rect.width;
+      const x = (clientX - rect.left) * s;
+      const y = (clientY - rect.top) * s;
       const inside =
         clientX >= rect.left &&
         clientX <= rect.right &&
@@ -170,17 +274,15 @@ export default function FooterBigText({ text = "SUMITKASAUDHAN" }) {
         if (active) deactivate(touch ? 500 : 0);
         return;
       }
-
-      spotRef.current?.setAttribute("r", radius);
+      clearTimeout(hideTimer);
+      radius = r;
       if (!active) {
         cur.x = x;
         cur.y = y;
-        setSpot(x, y);
       }
       target.x = x;
       target.y = y;
-      activate();
-      kick();
+      setActive(true);
     };
 
     const onPointerMove = (e) => {
@@ -205,9 +307,29 @@ export default function FooterBigText({ text = "SUMITKASAUDHAN" }) {
     host.addEventListener("touchend", onTouchEnd, { passive: true });
     host.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
+    /* ---------------- init ---------------- */
+    build();
+
+    let roRaf = 0;
+    const ro =
+      "ResizeObserver" in window
+        ? new ResizeObserver(() => {
+            cancelAnimationFrame(roRaf);
+            roRaf = requestAnimationFrame(build);
+          })
+        : null;
+    ro?.observe(canvas);
+
+    if (document.fonts) {
+      document.fonts.load("900 100px Inter").then(build).catch(() => {});
+      document.fonts.ready.then(build).catch(() => {});
+    }
+
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(roRaf);
       clearTimeout(hideTimer);
+      ro?.disconnect();
       host.removeEventListener("pointermove", onPointerMove);
       host.removeEventListener("pointerleave", onPointerLeave);
       host.removeEventListener("touchstart", onTouch);
@@ -215,219 +337,11 @@ export default function FooterBigText({ text = "SUMITKASAUDHAN" }) {
       host.removeEventListener("touchend", onTouchEnd);
       host.removeEventListener("touchcancel", onTouchEnd);
     };
-  }, []);
-
-  const common = {
-    x: 0,
-    y: BASE_Y,
-    transform: `scale(${sx} 1)`,
-    className: "fbt-text",
-  };
-
-  // sheen sirf desktop pe aur sirf jab footer screen par ho
-  const showSheen = !isCoarse && inView;
-  const bloomId = isCoarse ? "fbtBloomLite" : "fbtBloom";
+  }, [text]);
 
   return (
     <div className="fbt-wrap" ref={wrapRef} aria-hidden="true">
-      <svg
-        ref={svgRef}
-        className="fbt-svg"
-        viewBox={`${VB_X} 0 ${VB_W} ${VB_H}`}
-        preserveAspectRatio="xMidYMin meet"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="fbtBase" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e6fbff" stopOpacity="0.36" />
-            <stop offset="38%" stopColor="#22d3ee" stopOpacity="0.26" />
-            <stop offset="78%" stopColor="#0e7490" stopOpacity="0.14" />
-            <stop offset="100%" stopColor="#0b1220" stopOpacity="0.04" />
-          </linearGradient>
-
-          <linearGradient id="fbtStroke" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.38" />
-            <stop offset="55%" stopColor="#22d3ee" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.45" />
-          </linearGradient>
-
-          <linearGradient id="fbtHot" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f0fdff" stopOpacity="0.95" />
-            <stop offset="45%" stopColor="#5eead4" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#0e7490" stopOpacity="0.3" />
-          </linearGradient>
-
-          {showSheen && (
-            <linearGradient
-              id="fbtSheen"
-              gradientUnits="userSpaceOnUse"
-              x1="-500"
-              y1="0"
-              x2="-150"
-              y2="0"
-            >
-              <stop offset="0%" stopColor="#fff" stopOpacity="0" />
-              <stop offset="50%" stopColor="#fff" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-              <animateTransform
-                attributeName="gradientTransform"
-                type="translate"
-                from="0 0"
-                to="2100 0"
-                dur="7s"
-                repeatCount="indefinite"
-              />
-            </linearGradient>
-          )}
-
-          <radialGradient
-            ref={spotRef}
-            id="fbtSpot"
-            gradientUnits="userSpaceOnUse"
-            cx="-1000"
-            cy="-1000"
-            fx="-1000"
-            fy="-1000"
-            r="200"
-          >
-            <stop offset="0%" stopColor="#fff" />
-            <stop offset="22%" stopColor="#e8e8e8" />
-            <stop offset="48%" stopColor="#8a8a8a" />
-            <stop offset="74%" stopColor="#2c2c2c" />
-            <stop offset="100%" stopColor="#000" />
-          </radialGradient>
-          <mask
-            id="fbtMask"
-            maskUnits="userSpaceOnUse"
-            x={VB_X}
-            y="-40"
-            width={VB_W}
-            height={TEXT_H + 80}
-          >
-            <rect x={VB_X} y="-40" width={VB_W} height={TEXT_H + 80} fill="url(#fbtSpot)" />
-          </mask>
-
-          <linearGradient id="fbtFloorLine" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0" />
-            <stop offset="50%" stopColor="#67e8f9" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
-          </linearGradient>
-          <radialGradient id="fbtFloorGlow">
-            <stop offset="0%" stopColor="#5eead4" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
-          </radialGradient>
-
-          {/* desktop bloom */}
-          <filter id="fbtBloom" x="-10%" y="-30%" width="120%" height="160%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="wide" />
-            <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="tight" />
-            <feMerge>
-              <feMergeNode in="wide" />
-              <feMergeNode in="tight" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          {/* touch devices ke liye halka (kam GPU load) */}
-          <filter id="fbtBloomLite" x="-8%" y="-25%" width="116%" height="150%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b" />
-            <feMerge>
-              <feMergeNode in="b" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <filter id="fbtSoft" x="-10%" y="-50%" width="120%" height="200%">
-            <feGaussianBlur stdDeviation="3" />
-          </filter>
-
-          <linearGradient
-            id="fbtReflectFade"
-            gradientUnits="userSpaceOnUse"
-            x1="0"
-            y1={BASE_Y}
-            x2="0"
-            y2={VB_H}
-          >
-            <stop offset="0%" stopColor="#fff" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-          </linearGradient>
-          <mask
-            id="fbtReflectMask"
-            maskUnits="userSpaceOnUse"
-            x={VB_X}
-            y={BASE_Y}
-            width={VB_W}
-            height={REFLECT_H}
-          >
-            <rect x={VB_X} y={BASE_Y} width={VB_W} height={REFLECT_H} fill="url(#fbtReflectFade)" />
-          </mask>
-        </defs>
-
-        {/* ===== static artwork (reflection me reuse) ===== */}
-        <g id="fbtArt">
-          <text
-            ref={baseTextRef}
-            {...common}
-            fill="url(#fbtBase)"
-            stroke="url(#fbtStroke)"
-            strokeWidth="1.1"
-            strokeLinejoin="round"
-          >
-            {text}
-          </text>
-
-          {showSheen && (
-            <text {...common} className="fbt-text fbt-sheen" fill="url(#fbtSheen)">
-              {text}
-            </text>
-          )}
-        </g>
-
-        {/* ===== hover / touch glow (heavy filter sirf active hone par render) ===== */}
-        <g className="fbt-hot" mask="url(#fbtMask)">
-          <text
-            {...common}
-            fill="url(#fbtHot)"
-            stroke="#cffafe"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-            filter={`url(#${bloomId})`}
-          >
-            {text}
-          </text>
-        </g>
-
-        {/* ===== floor light ===== */}
-        <rect
-          x={VB_X}
-          y={BASE_Y - 1}
-          width={VB_W}
-          height="2"
-          fill="url(#fbtFloorLine)"
-          filter="url(#fbtSoft)"
-          opacity="0.7"
-        />
-        <g className="fbt-hot">
-          <ellipse ref={floorRef} cx="-1000" cy={BASE_Y + 3} rx="260" ry="14" fill="url(#fbtFloorGlow)" />
-        </g>
-
-        {/* ===== mirror reflection (glow bina filter ke, taaki light rahe) ===== */}
-        <g mask="url(#fbtReflectMask)">
-          <g transform={`translate(0 ${BASE_Y * 2}) scale(1 -1)`}>
-            <use href="#fbtArt" />
-            <g className="fbt-hot" mask="url(#fbtMask)">
-              <text
-                {...common}
-                fill="url(#fbtHot)"
-                stroke="#cffafe"
-                strokeWidth="1.5"
-                strokeLinejoin="round"
-              >
-                {text}
-              </text>
-            </g>
-          </g>
-        </g>
-      </svg>
+      <canvas ref={canvasRef} className="fbt-canvas" width={DW} height={DH} />
     </div>
   );
 }
