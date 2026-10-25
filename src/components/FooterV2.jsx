@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
+import FooterBigText from "./FooterBigText";
 
 const Footer = () => {
     const canvasRef = useRef(null);
@@ -279,6 +280,9 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Big brand text (max-w-6xl container ke BAHAR, footer ke andar) */}
+            <FooterBigText />
 
             <style>{`
                 @keyframes shimmer {

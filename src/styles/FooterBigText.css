@@ -1,0 +1,93 @@
+/* ===== Footer Big Text — premium glow + reflection, fully responsive ===== */
+.fbt-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1600px;
+    /* ultra-wide / 4K screens */
+    margin: 0 auto;
+    padding: 8px clamp(10px, 3vw, 32px) 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    line-height: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: none;
+}
+
+/* sabse neeche halka fade (reflection ke saath merge) */
+.fbt-wrap::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 18%;
+    background: linear-gradient(to bottom, rgba(2, 2, 14, 0), #02020e 100%);
+    pointer-events: none;
+}
+
+.fbt-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.fbt-text {
+    font-family: "Inter", "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 262px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+/* glow layers: footer hover (desktop) / auto-roam (touch) pe visible */
+.fbt-hot {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.fbt-wrap.is-active .fbt-hot {
+    opacity: 1;
+}
+
+/* ---------- Tablets / iPad ---------- */
+@media (max-width: 1024px) {
+    .fbt-wrap {
+        padding-top: 6px;
+    }
+}
+
+/* ---------- Mobiles ---------- */
+@media (max-width: 640px) {
+    .fbt-wrap {
+        padding: 4px 10px 0;
+    }
+
+    .fbt-wrap::after {
+        height: 22%;
+    }
+
+    /* chhoti screen par glow thoda halka taaki text clear rahe */
+    .fbt-svg {
+        filter: saturate(1.05);
+    }
+}
+
+/* ---------- Small phones ---------- */
+@media (max-width: 380px) {
+    .fbt-wrap {
+        padding: 2px 6px 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fbt-sheen {
+        display: none;
+    }
+
+    .fbt-hot {
+        transition: none;
+    }
+}
